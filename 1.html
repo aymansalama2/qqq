@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM JavaScript - Examen Blanc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Fond animé moderne avec motif */
+        body {
+            @apply min-h-screen;
+            background: 
+                linear-gradient(135deg, rgba(238, 119, 82, 0.1) 0%, rgba(231, 60, 126, 0.1) 25%, rgba(35, 166, 213, 0.1) 50%, rgba(35, 213, 171, 0.1) 75%),
+                radial-gradient(circle at 50% 0%, #ffffff 0%, transparent 75%);
+            background-size: 400% 400%, 100% 100%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        /* Effet de verre moderne */
+        .main-card {
+            @apply rounded-3xl p-8 relative overflow-hidden;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Question container avec effet de profondeur */
+        .question-container {
+            @apply bg-white/90 rounded-2xl p-8 mb-6 transition-all duration-300;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.03),
+                0 1px 2px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+        }
+
+        .question-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.05),
+                0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Options avec design moderne */
+        .option-label {
+            @apply flex items-center p-5 rounded-xl cursor-pointer transition-all duration-300;
+            background: linear-gradient(to right, transparent 50%, rgba(99, 102, 241, 0.08) 50%);
+            background-size: 200% 100%;
+            background-position: left bottom;
+            border: 2px solid transparent;
+        }
+
+        .option-label:hover {
+            background-position: right bottom;
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: scale(1.01);
+        }
+
+        .option-label.selected {
+            @apply bg-indigo-50;
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Radio buttons stylisés */
+        .radio-input {
+            @apply w-5 h-5 rounded-full;
+            appearance: none;
+            border: 2px solid #cbd5e1;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .radio-input:checked {
+            border-color: #6366f1;
+            background-color: #6366f1;
+        }
+
+        .radio-input:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        /* Timer futuriste */
+        .timer {
+            @apply text-2xl font-mono px-6 py-3 rounded-2xl;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #10b981;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Boutons de navigation modernes */
+        .nav-button {
+            @apply px-8 py-4 rounded-xl text-white font-medium transition-all duration-300;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .nav-button:active {
+            transform: translateY(0);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Barre de progression élégante */
+        .progress-container {
+            @apply bg-white/90 p-4 rounded-2xl;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-bar {
+            @apply h-4 rounded-full overflow-hidden;
+            background: linear-gradient(to right, #f1f5f9, #e2e8f0);
+        }
+
+        .progress-value {
+            @apply h-full transition-all duration-500;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
+            background-size: 200% 200%;
+            animation: progressGradient 3s ease infinite;
+        }
+
+        /* Animations */
+        @keyframes progressGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%, center; }
+            50% { background-position: 100% 50%, center; }
+            100% { background-position: 0% 50%, center; }
+        }
+
+        /* Résultats avec style moderne */
+        .results-card {
+            @apply rounded-3xl p-8;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+        }
+
+        .correction-item {
+            @apply p-6 rounded-2xl mb-4 transition-all duration-300;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .correction-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                    <span class="block">Examen Blanc</span>
+                    <span class="block text-primary-600">JavaScript</span>
+                </h1>
+                <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                    Préparation au mi-temps 2025
+                </p>
+            </div>
+
+            <!-- Main Quiz Container -->
+            <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
+                <!-- Progress Header -->
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <!-- Timer -->
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span id="timer" class="text-lg font-mono text-gray-700">00:00:00</span>
+                        </div>
+                        
+                        <!-- Progress -->
+                        <div class="flex-1 mx-8">
+                            <div class="flex items-center justify-between text-sm text-gray-600 mb-1">
+                                <span>Progression</span>
+                                <span><span id="current-question">1</span>/<span id="total-questions">50</span></span>
+                            </div>
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div id="progress-value" class="h-full bg-primary-500 transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Content -->
+                <div class="p-6">
+                    <form id="quizForm" class="space-y-8">
+                        <div id="questions-container">
+                            <!-- Questions will be generated here -->
+                        </div>
+
+                        <!-- Navigation -->
+                        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                            <button type="button" id="prev-btn" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                                ← Question précédente
+                            </button>
+                            <span class="text-sm font-medium text-gray-500" id="question-counter">Question 1/50</span>
+                            <button type="button" id="next-btn" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                                Question suivante →
+                            </button>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-center gap-4 pt-6 border-t border-gray-200">
+                            <button type="submit" class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
+                                Valider
+                            </button>
+                            <button type="reset" class="inline-flex items-center px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                                Réinitialiser
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="mt-12 hidden">
+                <!-- Results content will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données des questions et réponses
+        const questions = [
+            {
+                question: "Quel mot-clé permet de déclarer une variable accessible uniquement dans le bloc où elle est définie ?",
+                options: [
+                    "A. var",
+                    "B. let",
+                    "C. const",
+                    "D. function"
+                ],
+                correctAnswer: "B",
+                explanation: "let permet de déclarer une variable avec une portée de bloc."
+            },
+            {
+                question: "Quelle méthode permet de transformer un tableau en chaîne de caractères en insérant un séparateur ?",
+                options: [
+                    "A. split()",
+                    "B. join()",
+                    "C. concat()",
+                    "D. reduce()"
+                ],
+                correctAnswer: "B",
+                explanation: "La méthode join() permet de transformer un tableau en chaîne en utilisant un séparateur."
+            },
+            {
+                question: "Que retourne typeof null en JavaScript ?",
+                options: [
+                    "A. \"null\"",
+                    "B. \"undefined\"",
+                    "C. \"object\"",
+                    "D. \"string\""
+                ],
+                correctAnswer: "C",
+                explanation: "En JavaScript, typeof null retourne \"object\", c'est un bug historique du langage."
+            },
+            {
+                question: "Comment s'appelle la phase où JavaScript prépare les déclarations de variables et de fonctions en mémoire avant l'exécution ?",
+                options: [
+                    "A. Héritage",
+                    "B. Initialisation",
+                    "C. Hoisting",
+                    "D. Instanciation"
+                ],
+                correctAnswer: "C",
+                explanation: "Le hoisting est le processus par lequel JavaScript déplace les déclarations au sommet de leur portée avant l'exécution."
+            },
+            {
+                question: "Quelle est la valeur de NaN === NaN ?",
+                options: [
+                    "A. true",
+                    "B. false",
+                    "C. Lève une erreur",
+                    "D. undefined"
+                ],
+                correctAnswer: "B",
+                explanation: "NaN est la seule valeur en JavaScript qui n'est pas égale à elle-même."
+            },
+            {
+                question: "Quelle méthode ajoute un ou plusieurs éléments à la fin d'un tableau ?",
+                options: [
+                    "A. push()",
+                    "B. pop()",
+                    "C. unshift()",
+                    "D. shift()"
+                ],
+                correctAnswer: "A",
+                explanation: "La méthode push() ajoute un ou plusieurs éléments à la fin d'un tableau et retourne la nouvelle longueur."
+            },
+            {
+                question: "Lequel de ces types n'existe pas en JavaScript ?",
+                options: [
+                    "A. number",
+                    "B. boolean",
+                    "C. symbol",
+                    "D. double"
+                ],
+                correctAnswer: "D",
+                explanation: "double n'est pas un type en JavaScript. Les nombres sont tous du type 'number'."
+            },
+            {
+                question: "Quelle méthode est utilisée pour convertir une chaîne en nombre entier ?",
+                options: [
+                    "A. parseInt()",
+                    "B. parseFloat()",
+                    "C. Number()",
+                    "D. Math.floor()"
+                ],
+                correctAnswer: "A",
+                explanation: "parseInt() convertit une chaîne en nombre entier, en ignorant les décimales."
+            },
+            {
+                question: "Quel est le résultat de '5' + 3 ?",
+                options: [
+                    "A. 8",
+                    "B. 53",
+                    "C. NaN",
+                    "D. Lève une erreur"
+                ],
+                correctAnswer: "B",
+                explanation: "En JavaScript, l'opérateur + avec une chaîne effectue une concaténation."
+            },
+            {
+                question: "Quelle structure permet de gérer les erreurs avec un bloc d'exécution et un bloc de récupération ?",
+                options: [
+                    "A. if / else",
+                    "B. try / catch",
+                    "C. switch / case",
+                    "D. throw / return"
+                ],
+                correctAnswer: "B",
+                explanation: "try/catch permet d'exécuter du code qui pourrait générer une erreur et de la gérer proprement."
+            },
+            {
+                question: "Quel mot-clé est utilisé pour stopper entièrement une boucle for ?",
+                options: [
+                    "A. stop",
+                    "B. exit",
+                    "C. break",
+                    "D. return"
+                ],
+                correctAnswer: "C",
+                explanation: "break permet de sortir complètement d'une boucle."
+            },
+            {
+                question: "Que fait Array.prototype.map() ?",
+                options: [
+                    "A. Il modifie le tableau d'origine",
+                    "B. Il renvoie un nouveau tableau transformé",
+                    "C. Il efface le contenu du tableau",
+                    "D. Il trie le tableau"
+                ],
+                correctAnswer: "B",
+                explanation: "map() crée un nouveau tableau avec les résultats de l'appel d'une fonction sur chaque élément."
+            },
+            {
+                question: "Quelle est la portée d'une variable déclarée avec var dans une fonction ?",
+                options: [
+                    "A. Portée bloc",
+                    "B. Portée globale",
+                    "C. Portée de fonction",
+                    "D. Portée script uniquement"
+                ],
+                correctAnswer: "C",
+                explanation: "Une variable var déclarée dans une fonction a une portée limitée à cette fonction."
+            },
+            {
+                question: "Quelle est la sortie de console.log(2 == '2') ?",
+                options: [
+                    "A. true",
+                    "B. false",
+                    "C. undefined",
+                    "D. Erreur de type"
+                ],
+                correctAnswer: "A",
+                explanation: "L'opérateur == effectue une conversion de type avant la comparaison."
+            },
+            {
+                question: "Dans une fonction fléchée, que représente this ?",
+                options: [
+                    "A. L'objet global (window en navigateur)",
+                    "B. Le contexte courant",
+                    "C. L'instance de la fonction",
+                    "D. Il n'existe pas de this dans les fonctions fléchées"
+                ],
+                correctAnswer: "B",
+                explanation: "Dans une fonction fléchée, this est lexicalement lié au contexte englobant."
+            },
+            {
+                question: "Quelle est la valeur par défaut de arguments dans une fonction fléchée ?",
+                options: [
+                    "A. Un tableau vide",
+                    "B. Tous les arguments passés",
+                    "C. undefined",
+                    "D. Les fonctions fléchées n'ont pas arguments"
+                ],
+                correctAnswer: "D",
+                explanation: "Les fonctions fléchées n'ont pas leur propre objet arguments."
+            },
+            {
+                question: "Que retourne typeof [] ?",
+                options: [
+                    "A. \"array\"",
+                    "B. \"object\"",
+                    "C. \"[]\"",
+                    "D. \"undefined\""
+                ],
+                correctAnswer: "B",
+                explanation: "En JavaScript, les tableaux sont des objets, donc typeof [] retourne \"object\"."
+            },
+            {
+                question: "Quelle méthode permet de vérifier si un tableau contient un élément ?",
+                options: [
+                    "A. Array.includes()",
+                    "B. Array.has()",
+                    "C. Array.find()",
+                    "D. Array.match()"
+                ],
+                correctAnswer: "A",
+                explanation: "includes() vérifie si un tableau contient une valeur spécifique."
+            },
+            {
+                question: "Que renvoie false == 0 ?",
+                options: [
+                    "A. true",
+                    "B. false",
+                    "C. undefined",
+                    "D. Lève une erreur"
+                ],
+                correctAnswer: "A",
+                explanation: "Avec ==, JavaScript convertit les types avant la comparaison. false est converti en 0."
+            },
+            {
+                question: "Quelle méthode supprime le dernier élément d'un tableau et le renvoie ?",
+                options: [
+                    "A. push()",
+                    "B. pop()",
+                    "C. shift()",
+                    "D. splice()"
+                ],
+                correctAnswer: "B",
+                explanation: "pop() supprime et renvoie le dernier élément d'un tableau."
+            },
+            {
+                question: "Quelle syntaxe permet de déstructurer un objet ?",
+                options: [
+                    "A. let { nom } = objet;",
+                    "B. let [ nom ] = objet;",
+                    "C. let ( nom ) = objet;",
+                    "D. let <nom> = objet;"
+                ],
+                correctAnswer: "A",
+                explanation: "La déstructuration d'objet utilise les accolades {} et permet d'extraire des propriétés d'un objet."
+            },
+            {
+                question: "Comment déclarer une constante en JavaScript ?",
+                options: [
+                    "A. var CONSTANT",
+                    "B. let constant",
+                    "C. const constant",
+                    "D. CONST constant"
+                ],
+                correctAnswer: "C",
+                explanation: "const est le mot-clé pour déclarer une constante en JavaScript."
+            },
+            {
+                question: "Quel est le résultat de typeof NaN ?",
+                options: [
+                    "A. \"number\"",
+                    "B. \"NaN\"",
+                    "C. \"undefined\"",
+                    "D. \"object\""
+                ],
+                correctAnswer: "A",
+                explanation: "NaN est de type 'number' en JavaScript, même s'il représente 'Not a Number'."
+            },
+            {
+                question: "Que fait la méthode String.prototype.slice(start, end) ?",
+                options: [
+                    "A. Supprime une partie de la chaîne",
+                    "B. Renvoie une sous-chaîne entre start et end (exclu)",
+                    "C. Convertit la chaîne en tableau",
+                    "D. Découpe la chaîne en mots"
+                ],
+                correctAnswer: "B",
+                explanation: "slice() extrait une portion de la chaîne sans modifier l'original, de l'index start jusqu'à end (exclu)."
+            },
+            {
+                question: "Qu'est-ce qui n'est pas une structure de données native en JavaScript ?",
+                options: [
+                    "A. Map",
+                    "B. Set",
+                    "C. WeakMap",
+                    "D. List"
+                ],
+                correctAnswer: "D",
+                explanation: "List n'est pas une structure de données native en JavaScript."
+            },
+            {
+                question: "Quel est l'événement déclenché quand la page a fini de se charger en HTML ?",
+                options: [
+                    "A. onload",
+                    "B. DOMContentLoaded",
+                    "C. loadend",
+                    "D. ready"
+                ],
+                correctAnswer: "B",
+                explanation: "DOMContentLoaded est déclenché quand le DOM est complètement chargé et analysé."
+            },
+            {
+                question: "Quel opérateur compare et convertit éventuellement les types avant comparaison ?",
+                options: [
+                    "A. ===",
+                    "B. !==",
+                    "C. ==",
+                    "D. ="
+                ],
+                correctAnswer: "C",
+                explanation: "L'opérateur == effectue une conversion de type avant la comparaison."
+            },
+            {
+                question: "Quelle méthode convertit un objet JavaScript en JSON ?",
+                options: [
+                    "A. JSON.parse()",
+                    "B. JSON.stringify()",
+                    "C. obj.toString()",
+                    "D. String()"
+                ],
+                correctAnswer: "B",
+                explanation: "JSON.stringify() convertit un objet JavaScript en chaîne JSON."
+            },
+            {
+                question: "Dans quelle portée vit une variable déclarée avec let dans un bloc if ?",
+                options: [
+                    "A. Portée globale",
+                    "B. Portée de fonction",
+                    "C. Portée du bloc if",
+                    "D. Portée de script"
+                ],
+                correctAnswer: "C",
+                explanation: "let a une portée de bloc, donc la variable n'est accessible que dans le bloc if."
+            },
+            {
+                question: "Comment se nomme la syntaxe suivante : (...args) => {} ?",
+                options: [
+                    "A. Fonction classique",
+                    "B. Fonction anonyme",
+                    "C. Fonction fléchée (arrow function)",
+                    "D. Méthode d'un objet"
+                ],
+                correctAnswer: "C",
+                explanation: "C'est une fonction fléchée (arrow function), introduite en ES6."
+            },
+            {
+                question: "Quelle méthode array renvoie le premier élément qui satisfait une condition ?",
+                options: [
+                    "A. filter()",
+                    "B. find()",
+                    "C. includes()",
+                    "D. forEach()"
+                ],
+                correctAnswer: "B",
+                explanation: "find() renvoie le premier élément qui satisfait la condition donnée."
+            },
+            {
+                question: "Quel objet global représente l'API de la console en JavaScript ?",
+                options: [
+                    "A. console",
+                    "B. log",
+                    "C. window.consoleAPI",
+                    "D. debug"
+                ],
+                correctAnswer: "A",
+                explanation: "L'objet console est l'API globale pour accéder à la console."
+            },
+            {
+                question: "Quelle est la sortie de Boolean([]) ?",
+                options: [
+                    "A. false",
+                    "B. true",
+                    "C. Lève une erreur",
+                    "D. null"
+                ],
+                correctAnswer: "B",
+                explanation: "Un tableau vide est considéré comme truthy en JavaScript."
+            },
+            {
+                question: "Comment définit-on une propriété d'un objet en utilisant la notation littérale ?",
+                options: [
+                    "A. let obj = { nom: \"Alice\" };",
+                    "B. let obj = Object(nom: \"Alice\");",
+                    "C. let obj = (nom = \"Alice\");",
+                    "D. obj.nom = \"Alice\";"
+                ],
+                correctAnswer: "A",
+                explanation: "La notation littérale utilise les accolades avec la syntaxe clé: valeur."
+            },
+            {
+                question: "Que fait la méthode Array.prototype.forEach() ?",
+                options: [
+                    "A. Renvoie un nouveau tableau",
+                    "B. Exécute une fonction sur chaque élément sans retourner de résultat",
+                    "C. Filtre les éléments selon une condition",
+                    "D. Casse la boucle dès qu'une condition est remplie"
+                ],
+                correctAnswer: "B",
+                explanation: "forEach() exécute une fonction pour chaque élément du tableau sans retourner de valeur."
+            },
+            {
+                question: "Comment générer un entier aléatoire entre 0 et 9 inclus ?",
+                options: [
+                    "A. Math.random() * 10",
+                    "B. Math.floor(Math.random() * 10)",
+                    "C. Math.floor(Math.random() * 9)",
+                    "D. Math.ceil(Math.random() * 9)"
+                ],
+                correctAnswer: "B",
+                explanation: "Math.floor(Math.random() * 10) génère un entier aléatoire de 0 à 9 inclus."
+            },
+            {
+                question: "Quelle propriété d'un objet Error en JavaScript contient le message d'erreur ?",
+                options: [
+                    "A. Error.text",
+                    "B. Error.message",
+                    "C. Error.info",
+                    "D. Error.description"
+                ],
+                correctAnswer: "B",
+                explanation: "La propriété message d'un objet Error contient le message d'erreur."
+            },
+            {
+                question: "Quelle est la bonne façon de déclarer une classe en JavaScript (ES6) ?",
+                options: [
+                    "A. function ClassName {}",
+                    "B. class ClassName {}",
+                    "C. var ClassName = class {}",
+                    "D. create class ClassName {}"
+                ],
+                correctAnswer: "B",
+                explanation: "La syntaxe class ClassName {} est la façon standard de déclarer une classe en ES6."
+            },
+            {
+                question: "Que renvoie isNaN(\"Hello\") ?",
+                options: [
+                    "A. true",
+                    "B. false",
+                    "C. Lève une erreur",
+                    "D. \"Hello\""
+                ],
+                correctAnswer: "A",
+                explanation: "isNaN(\"Hello\") renvoie true car la chaîne ne peut pas être convertie en nombre."
+            },
+            {
+                question: "Quel mot-clé permet de sortir d'une fonction et éventuellement de renvoyer une valeur ?",
+                options: [
+                    "A. break",
+                    "B. stop",
+                    "C. return",
+                    "D. exit"
+                ],
+                correctAnswer: "C",
+                explanation: "return permet de sortir d'une fonction et optionnellement de renvoyer une valeur."
+            },
+            {
+                question: "Quelle syntaxe ESM permet d'importer une exportation par défaut ?",
+                options: [
+                    "A. import { default } from \"module\";",
+                    "B. import default from \"module\";",
+                    "C. import * from \"module\";",
+                    "D. import something from \"module\";"
+                ],
+                correctAnswer: "D",
+                explanation: "Pour importer un export par défaut en ESM, on utilise import nom from \"module\"."
+            },
+            {
+                question: "Que retourne typeof function(){} ?",
+                options: [
+                    "A. \"function\"",
+                    "B. \"object\"",
+                    "C. \"function object\"",
+                    "D. \"undefined\""
+                ],
+                correctAnswer: "A",
+                explanation: "typeof sur une fonction retourne \"function\"."
+            },
+            {
+                question: "Lequel de ces opérateurs est utilisé pour la décomposition d'un tableau en arguments de fonction ?",
+                options: [
+                    "A. ...",
+                    "B. ::",
+                    "C. >>",
+                    "D. ??"
+                ],
+                correctAnswer: "A",
+                explanation: "L'opérateur spread (...) permet de décomposer un tableau en arguments distincts."
+            },
+            {
+                question: "Que fait l'opérateur ?? (nullish coalescing) ?",
+                options: [
+                    "A. Compare strictement deux valeurs",
+                    "B. Retourne la valeur de droite si la valeur de gauche est null ou undefined",
+                    "C. Effectue la fusion de deux objets",
+                    "D. Vérifie si la valeur est strictement null"
+                ],
+                correctAnswer: "B",
+                explanation: "L'opérateur ?? retourne la valeur de droite uniquement si la valeur de gauche est null ou undefined."
+            },
+            {
+                question: "Quelle méthode permet de fusionner deux tableaux ?",
+                options: [
+                    "A. merge()",
+                    "B. concat()",
+                    "C. join()",
+                    "D. combine()"
+                ],
+                correctAnswer: "B",
+                explanation: "concat() permet de fusionner deux ou plusieurs tableaux en retournant un nouveau tableau."
+            },
+            {
+                question: "Comment accéder à la longueur d'un tableau en JavaScript ?",
+                options: [
+                    "A. array.size",
+                    "B. array.length",
+                    "C. array.count",
+                    "D. array.dimension"
+                ],
+                correctAnswer: "B",
+                explanation: "La propriété length donne le nombre d'éléments dans un tableau."
+            },
+            {
+                question: "Quelle méthode permet de convertir une chaîne JSON en objet JavaScript ?",
+                options: [
+                    "A. JSON.toObject()",
+                    "B. JSON.parse()",
+                    "C. JSON.decode()",
+                    "D. JSON.deserialize()"
+                ],
+                correctAnswer: "B",
+                explanation: "JSON.parse() convertit une chaîne JSON valide en objet JavaScript."
+            },
+            {
+                question: "Comment déclarer une fonction asynchrone en JavaScript ?",
+                options: [
+                    "A. function* myFunc()",
+                    "B. async function myFunc()",
+                    "C. await function myFunc()",
+                    "D. promise function myFunc()"
+                ],
+                correctAnswer: "B",
+                explanation: "Le mot-clé async devant une fonction la déclare comme asynchrone."
+            },
+            {
+                question: "Quelle méthode permet d'attendre qu'une promesse soit résolue ?",
+                options: [
+                    "A. wait()",
+                    "B. await",
+                    "C. then()",
+                    "D. resolve()"
+                ],
+                correctAnswer: "B",
+                explanation: "Le mot-clé await permet d'attendre la résolution d'une promesse dans une fonction async."
+            },
+            {
+                question: "Comment créer une nouvelle promesse en JavaScript ?",
+                options: [
+                    "A. Promise()",
+                    "B. new Promise((resolve, reject) => {})",
+                    "C. async Promise()",
+                    "D. await Promise()"
+                ],
+                correctAnswer: "B",
+                explanation: "Une nouvelle promesse est créée avec new Promise() et une fonction exécuteur."
+            },
+            {
+                question: "Quelle méthode permet de copier un tableau superficiellement ?",
+                options: [
+                    "A. array.copy()",
+                    "B. [...array]",
+                    "C. array.clone()",
+                    "D. Object.assign([], array)"
+                ],
+                correctAnswer: "B",
+                explanation: "L'opérateur spread (...) permet de créer une copie superficielle d'un tableau."
+            },
+            {
+                question: "Comment vérifier si une variable est un tableau ?",
+                options: [
+                    "A. typeof variable === 'array'",
+                    "B. Array.isArray(variable)",
+                    "C. variable instanceof Array",
+                    "D. variable.isArray()"
+                ],
+                correctAnswer: "B",
+                explanation: "Array.isArray() est la méthode recommandée pour vérifier si une variable est un tableau."
+            },
+            {
+                question: "Quelle méthode permet d'exécuter une fonction après un délai ?",
+                options: [
+                    "A. delay()",
+                    "B. wait()",
+                    "C. setTimeout()",
+                    "D. sleep()"
+                ],
+                correctAnswer: "C",
+                explanation: "setTimeout() permet d'exécuter une fonction après un délai spécifié en millisecondes."
+            },
+            {
+                question: "Comment accéder au premier élément d'un tableau ?",
+                options: [
+                    "A. array.first",
+                    "B. array[0]",
+                    "C. array.start",
+                    "D. array.head"
+                ],
+                correctAnswer: "B",
+                explanation: "On accède au premier élément d'un tableau avec l'index 0."
+            },
+            {
+                question: "Quelle méthode permet de trier un tableau ?",
+                options: [
+                    "A. array.order()",
+                    "B. array.sort()",
+                    "C. array.organize()",
+                    "D. array.arrange()"
+                ],
+                correctAnswer: "B",
+                explanation: "sort() permet de trier les éléments d'un tableau (modifie le tableau original)."
+            },
+            {
+                question: "Comment créer une classe qui hérite d'une autre en JavaScript ?",
+                options: [
+                    "A. class Child inherits Parent",
+                    "B. class Child extends Parent",
+                    "C. class Child implements Parent",
+                    "D. class Child : Parent"
+                ],
+                correctAnswer: "B",
+                explanation: "Le mot-clé extends est utilisé pour l'héritage de classe en JavaScript."
+            },
+            {
+                question: "Quelle méthode permet d'ajouter un élément au début d'un tableau ?",
+                options: [
+                    "A. unshift()",
+                    "B. prepend()",
+                    "C. addFirst()",
+                    "D. insertStart()"
+                ],
+                correctAnswer: "A",
+                explanation: "unshift() ajoute un ou plusieurs éléments au début d'un tableau."
+            },
+            {
+                question: "Comment créer un objet vide en JavaScript ?",
+                options: [
+                    "A. new Object",
+                    "B. {}",
+                    "C. Object.create(null)",
+                    "D. Toutes les réponses sont correctes"
+                ],
+                correctAnswer: "D",
+                explanation: "Il existe plusieurs façons de créer un objet vide en JavaScript."
+            },
+            {
+                question: "Quelle méthode permet de vérifier si une chaîne commence par une sous-chaîne ?",
+                options: [
+                    "A. startsWith()",
+                    "B. beginsWith()",
+                    "C. includes()",
+                    "D. hasPrefix()"
+                ],
+                correctAnswer: "A",
+                explanation: "startsWith() vérifie si une chaîne commence par une sous-chaîne donnée."
+            },
+            {
+                question: "Comment accéder à un élément HTML par son ID ?",
+                options: [
+                    "A. document.findById()",
+                    "B. document.getElementById()",
+                    "C. document.queryId()",
+                    "D. document.selectById()"
+                ],
+                correctAnswer: "B",
+                explanation: "getElementById() est la méthode pour sélectionner un élément par son ID."
+            },
+            {
+                question: "Quelle méthode permet d'ajouter une classe à un élément HTML ?",
+                options: [
+                    "A. element.class.add()",
+                    "B. element.addClass()",
+                    "C. element.classList.add()",
+                    "D. element.className.push()"
+                ],
+                correctAnswer: "C",
+                explanation: "classList.add() permet d'ajouter une classe à un élément HTML."
+            },
+            {
+                question: "Comment créer un nouvel élément HTML en JavaScript ?",
+                options: [
+                    "A. document.new('div')",
+                    "B. document.createElement('div')",
+                    "C. document.addElement('div')",
+                    "D. document.makeElement('div')"
+                ],
+                correctAnswer: "B",
+                explanation: "createElement() crée un nouvel élément HTML du type spécifié."
+            },
+            {
+                question: "Quelle méthode permet d'attendre que plusieurs promesses soient résolues ?",
+                options: [
+                    "A. Promise.all()",
+                    "B. Promise.wait()",
+                    "C. Promise.every()",
+                    "D. Promise.complete()"
+                ],
+                correctAnswer: "A",
+                explanation: "Promise.all() attend que toutes les promesses passées soient résolues."
+            },
+            {
+                question: "Comment définir une propriété en lecture seule sur un objet ?",
+                options: [
+                    "A. Object.defineProperty() avec writable: false",
+                    "B. Object.seal()",
+                    "C. Object.freeze()",
+                    "D. Object.lock()"
+                ],
+                correctAnswer: "A",
+                explanation: "Object.defineProperty() avec writable: false crée une propriété en lecture seule."
+            },
+            {
+                question: "Quelle méthode permet de supprimer un élément d'un tableau à un index donné ?",
+                options: [
+                    "A. delete()",
+                    "B. remove()",
+                    "C. splice()",
+                    "D. cut()"
+                ],
+                correctAnswer: "C",
+                explanation: "splice() permet de supprimer des éléments d'un tableau à partir d'un index donné."
+            },
+            {
+                question: "Comment vérifier si une propriété existe dans un objet ?",
+                options: [
+                    "A. object.hasProperty()",
+                    "B. object.hasOwnProperty()",
+                    "C. object.contains()",
+                    "D. object.includes()"
+                ],
+                correctAnswer: "B",
+                explanation: "hasOwnProperty() vérifie si une propriété existe directement sur l'objet."
+            },
+            {
+                question: "Quelle méthode permet de convertir un nombre en chaîne de caractères ?",
+                options: [
+                    "A. number.toString()",
+                    "B. String(number)",
+                    "C. number + ''",
+                    "D. Toutes les réponses sont correctes"
+                ],
+                correctAnswer: "D",
+                explanation: "Il existe plusieurs façons de convertir un nombre en chaîne en JavaScript."
+            },
+            {
+                question: "Comment empêcher la modification d'un objet en JavaScript ?",
+                options: [
+                    "A. Object.seal()",
+                    "B. Object.freeze()",
+                    "C. Object.preventExtensions()",
+                    "D. Object.lock()"
+                ],
+                correctAnswer: "B",
+                explanation: "Object.freeze() rend un objet immuable, empêchant toute modification."
+            },
+            {
+                question: "Quelle méthode permet d'exécuter une fonction à intervalles réguliers ?",
+                options: [
+                    "A. setInterval()",
+                    "B. setTimeout()",
+                    "C. requestAnimationFrame()",
+                    "D. repeat()"
+                ],
+                correctAnswer: "A",
+                explanation: "setInterval() exécute une fonction de manière répétée à intervalles réguliers."
+            }
+        ];
+
+        // Ajout des fonctionnalités améliorées
+        const state = {
+            currentQuestion: 0,
+            answeredQuestions: new Set(),
+            startTime: null,
+            timer: null,
+            answers: new Array(questions.length).fill(null)
+        };
+
+        function updateProgress() {
+            const progress = state.answeredQuestions.size;
+            const total = questions.length;
+            const percentage = (progress / total) * 100;
+            
+            document.getElementById('progress-value').style.width = `${percentage}%`;
+        }
+
+        function updateTimer() {
+            if (!state.startTime) {
+                state.startTime = new Date();
+            }
+            
+            const now = new Date();
+            const diff = now - state.startTime;
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            
+            document.getElementById('timer').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function showQuestion(index) {
+            const questions = document.querySelectorAll('.question-container');
+            questions.forEach(q => q.style.display = 'none');
+            
+            const currentQuestion = document.querySelector(`.question-container[data-index="${index}"]`);
+            if (currentQuestion) {
+                currentQuestion.style.display = 'block';
+            }
+            
+            // Mettre à jour les boutons et compteurs
+            document.getElementById('prev-btn').disabled = index === 0;
+            document.getElementById('next-btn').textContent = 
+                index === questions.length - 1 ? 'Terminer le test →' : 'Question suivante →';
+            
+            document.getElementById('current-question').textContent = index + 1;
+            document.getElementById('question-counter').textContent = `Question ${index + 1}/${questions.length}`;
+            
+            state.currentQuestion = index;
+        }
+
+        function handleRadioChange(e) {
+            if (e.target.type === 'radio') {
+                const name = e.target.name;
+                const questionContainer = e.target.closest('.question-container');
+                if (questionContainer) {
+                    questionContainer.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+                        const label = input.closest('.option-label');
+                        if (label) {
+                            label.classList.remove('selected');
+                        }
+                    });
+                    const selectedLabel = e.target.closest('.option-label');
+                    if (selectedLabel) {
+                        selectedLabel.classList.add('selected');
+                    }
+                }
+            }
+        }
+
+        function generateQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-container hidden';
+                questionDiv.dataset.index = index;
+                questionDiv.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <span class="flex-shrink-0 h-6 w-6 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-semibold text-sm">
+                                ${index + 1}
+                            </span>
+                            <h3 class="ml-3 text-lg font-medium text-gray-900">
+                                ${q.question}
+                            </h3>
+                        </div>
+                        <div class="ml-9 space-y-3">
+                            ${q.options.map(option => `
+                                <label class="option-label flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 cursor-pointer transition-all duration-200">
+                                    <input type="radio" 
+                                           name="q${index + 1}" 
+                                           value="${option[0]}" 
+                                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                                           onchange="handleAnswer(${index}, '${option[0]}')">
+                                    <span class="ml-3 text-gray-700">${option}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(questionDiv);
+            });
+
+            showQuestion(0);
+        }
+
+        function handleAnswer(questionIndex, answer) {
+            state.answers[questionIndex] = answer;
+            state.answeredQuestions.add(questionIndex);
+            
+            // Mettre à jour les styles des options
+            const questionContainer = document.querySelector(`.question-container[data-index="${questionIndex}"]`);
+            if (questionContainer) {
+                const labels = questionContainer.querySelectorAll('.option-label');
+                labels.forEach(label => {
+                    const radio = label.querySelector('input[type="radio"]');
+                    if (radio) {
+                        if (radio.value === answer) {
+                            label.classList.add('selected');
+                        } else {
+                            label.classList.remove('selected');
+                        }
+                    }
+                });
+            }
+            
+            updateProgress();
+            saveState();
+        }
+
+        function showResults(score, total) {
+            const results = document.getElementById('results');
+            const percentage = (score / total) * 100;
+            
+            results.innerHTML = `
+                <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
+                    <div class="px-6 py-8 border-b border-gray-200 text-center">
+                        <h2 class="text-3xl font-bold text-gray-900">Résultats</h2>
+                        <div class="mt-6">
+                            <div class="text-6xl font-bold ${percentage >= 50 ? 'text-green-600' : 'text-red-600'}">
+                                ${percentage.toFixed(1)}%
+                            </div>
+                            <p class="mt-2 text-2xl font-semibold text-gray-700">${score}/${total}</p>
+                            <p class="mt-1 text-gray-500">Temps total: ${document.getElementById('timer').textContent}</p>
+                        </div>
+                    </div>
+                    <div class="px-6 py-6">
+                        <div id="corrections" class="space-y-6">
+                            <!-- Corrections will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Ajouter ces fonctions pour la gestion du stockage local
+        function saveState() {
+            localStorage.setItem('quizState', JSON.stringify({
+                answers: state.answers,
+                answeredQuestions: Array.from(state.answeredQuestions),
+                currentQuestion: state.currentQuestion,
+                startTime: state.startTime ? state.startTime.getTime() : null
+            }));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('quizState');
+            if (savedState) {
+                const parsed = JSON.parse(savedState);
+                state.answers = parsed.answers;
+                state.answeredQuestions = new Set(parsed.answeredQuestions);
+                state.currentQuestion = parsed.currentQuestion;
+                state.startTime = parsed.startTime ? new Date(parsed.startTime) : null;
+                
+                // Restaurer les réponses sélectionnées après un court délai
+                setTimeout(() => {
+                    state.answers.forEach((answer, index) => {
+                        if (answer) {
+                            handleAnswer(index, answer);
+                            const radio = document.querySelector(`input[name="q${index + 1}"][value="${answer}"]`);
+                            if (radio) {
+                                radio.checked = true;
+                            }
+                        }
+                    });
+                    updateProgress();
+                    showQuestion(state.currentQuestion);
+                }, 0);
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            generateQuestions();
+            
+            // Charger l'état sauvegardé
+            loadState();
+            
+            if (!state.startTime) {
+                state.startTime = new Date();
+            }
+            
+            state.timer = setInterval(updateTimer, 1000);
+            updateProgress();
+            
+            // Mettre à jour le nombre total de questions
+            document.getElementById('total-questions').textContent = questions.length;
+
+            // Ajouter les gestionnaires d'événements après la génération des questions
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                if (state.currentQuestion > 0) {
+                    showQuestion(state.currentQuestion - 1);
+                }
+            });
+
+            document.getElementById('next-btn').addEventListener('click', () => {
+                if (state.currentQuestion < questions.length - 1) {
+                    showQuestion(state.currentQuestion + 1);
+                } else {
+                    document.getElementById('quizForm').dispatchEvent(new Event('submit'));
+                }
+            });
+
+            document.getElementById('quizForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (state.answeredQuestions.size < questions.length) {
+                    if (!confirm('Certaines questions n\'ont pas de réponse. Voulez-vous vraiment terminer le test ?')) {
+                        return;
+                    }
+                }
+                
+                clearInterval(state.timer);
+                let score = 0;
+                
+                // Créer d'abord la structure des résultats
+                const results = document.getElementById('results');
+                results.innerHTML = `
+                    <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
+                        <div class="px-6 py-8 border-b border-gray-200 text-center">
+                            <h2 class="text-3xl font-bold text-gray-900">Résultats</h2>
+                            <div class="mt-6" id="score-display">
+                                <!-- Le score sera inséré ici -->
+                            </div>
+                        </div>
+                        <div class="px-6 py-6">
+                            <div id="corrections" class="space-y-6">
+                                <!-- Les corrections seront insérées ici -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Maintenant on peut accéder à l'élément corrections
+                const corrections = document.getElementById('corrections');
+                
+                questions.forEach((q, index) => {
+                    const answer = state.answers[index];
+                    const isCorrect = answer === q.correctAnswer;
+                    if (isCorrect) score++;
+                    
+                    const correctionDiv = document.createElement('div');
+                    correctionDiv.className = `p-4 rounded-lg ${isCorrect ? 'bg-green-50' : 'bg-red-50'}`;
+                    correctionDiv.innerHTML = `
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1">
+                                ${isCorrect 
+                                    ? '<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>'
+                                    : '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/></svg>'}
+                            </div>
+                            <div class="ml-3">
+                                <p class="font-medium">${index + 1}. ${q.question}</p>
+                                <p class="mt-1">Votre réponse: <span class="${isCorrect ? 'text-green-600' : 'text-red-600'}">${answer || 'Non répondu'}</span></p>
+                                <p class="mt-1">Réponse correcte: <span class="text-green-600 font-medium">${q.correctAnswer}</span></p>
+                                <p class="mt-2 text-sm text-gray-600">${q.explanation}</p>
+                            </div>
+                        </div>
+                    `;
+                    corrections.appendChild(correctionDiv);
+                });
+
+                // Mettre à jour l'affichage du score
+                const percentage = (score / questions.length) * 100;
+                document.getElementById('score-display').innerHTML = `
+                    <div class="text-6xl font-bold ${percentage >= 50 ? 'text-green-600' : 'text-red-600'}">
+                        ${percentage.toFixed(1)}%
+                    </div>
+                    <p class="mt-2 text-2xl font-semibold text-gray-700">${score}/${questions.length}</p>
+                    <p class="mt-1 text-gray-500">Temps total: ${document.getElementById('timer').textContent}</p>
+                `;
+
+                results.classList.remove('hidden');
+                results.scrollIntoView({ behavior: 'smooth' });
+                
+                // Sauvegarder le score final
+                localStorage.setItem('quizScore', score);
+            });
+
+            document.getElementById('quizForm').addEventListener('reset', function(e) {
+                if (confirm('Voulez-vous vraiment réinitialiser le test ? Toutes vos réponses seront effacées.')) {
+                    localStorage.removeItem('quizState');
+                    localStorage.removeItem('quizScore');
+                    state.answers = new Array(questions.length).fill(null);
+                    state.answeredQuestions = new Set();
+                    state.currentQuestion = 0;
+                    state.startTime = new Date();
+                    updateProgress();
+                    showQuestion(0);
+                    
+                    // Décocher toutes les options
+                    document.querySelectorAll('input[type="radio"]').forEach(input => {
+                        input.checked = false;
+                        input.closest('.option-label').classList.remove('selected');
+                    });
+                } else {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
